@@ -32,6 +32,19 @@ ctest --output-on-failure
 Используется GoogleTest. Если он не установлен, CMake скачает его при первой
 сборке — потребуется интернет.
 
+## Скрипты для Linux
+
+```sh
+./scripts/build.sh         # Сборка Debug
+./scripts/build.sh Release # Сборка Release
+./scripts/run.sh           # Сборка и запуск
+./scripts/test.sh          # Сборка и запуск тестов
+./scripts/format.sh        # Форматирование кода (нужен clang-format)
+```
+
+Скрипты `build.sh`, `run.sh` и `test.sh` принимают `Debug` или `Release`.
+Результаты сборки находятся в `build/Debug` или `build/Release`.
+
 ## Структура
 
 - `core/` — хранение клеток и проходов, генерация и поиск пути.
