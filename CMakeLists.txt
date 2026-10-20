@@ -15,6 +15,9 @@ target_include_directories(maze PRIVATE
     cli/include
 )
 
+add_executable(maze_example main_example.cpp)
+target_include_directories(maze_example PRIVATE core/include cli/include)
+
 include(CTest)
 if(BUILD_TESTING)
     find_package(GTest CONFIG QUIET)
