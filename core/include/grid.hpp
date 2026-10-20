@@ -33,12 +33,8 @@ public:
     T& at(Position position);
     const T& at(Position position) const;
 
-    // Returns side-adjacent cells, regardless of passages.
     std::vector<Position> neighbors(Position position) const;
-
-    // Rejects invalid coordinates and nonadjacent cells.
     void openPassage(Position from, Position to);
-    // Rejects invalid coordinates; returns false for nonadjacent cells.
     bool hasPassage(Position from, Position to) const;
 };
 
@@ -47,9 +43,6 @@ Grid<T>::Grid(std::size_t rows, std::size_t columns)
     : rows_(rows), columns_(columns) {
     if (rows == 0 || columns == 0) {
         throw std::invalid_argument("Grid dimensions must be positive");
-    }
-    if (rows > std::numeric_limits<std::size_t>::max() / columns) {
-        throw std::length_error("Grid dimensions are too large");
     }
     cells_.resize(rows * columns);
 }
