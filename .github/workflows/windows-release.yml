@@ -1,0 +1,65 @@
+name: Windows release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to build
+        required: true
+        default: v0.1.0
+        type: string
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Configure
+        run: cmake -S . -B build -A x64 -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_DISABLE_FIND_PACKAGE_GTest=ON
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure --no-tests=error
+
+      - name: Smoke test CLI
+        run: |
+          $output = "0" | & .\build\Release\maze.exe
+          if ($LASTEXITCODE -ne 0 -or ($output -join "`n") -notmatch 'Generate and solve a maze') {
+            throw 'CLI startup check failed'
+          }
+
+      - name: Smoke test examples
+        run: |
+          $output = & .\build\Release\maze_example.exe
+          if ($LASTEXITCODE -ne 0 -or ($output -join "`n") -notmatch '5 x 5 cells' -or ($output -join "`n") -notmatch '4 x 7 cells') {
+            throw 'Example demonstration failed'
+          }
+
+      - name: Package
+        run: |
+          New-Item -ItemType Directory -Path package | Out-Null
+          Copy-Item build/Release/maze.exe, build/Release/maze_tests.exe, build/Release/maze_example.exe package/
+          Copy-Item scripts/windows/run.cmd, scripts/windows/tests.cmd, scripts/windows/examples.cmd, README.md package/
+          Compress-Archive -Path package/* -DestinationPath maze-windows-x64.zip
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          gh release create "$env:RELEASE_TAG" maze-windows-x64.zip --verify-tag --title "Maze $env:RELEASE_TAG" --notes "Windows x64: unzip the archive, then run run.cmd for the application examples.cmd for the two demonstrations, or tests.cmd for all tests. No compiler or GoogleTest installation is required."

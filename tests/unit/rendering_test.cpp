@@ -2,6 +2,20 @@
 
 #include <gtest/gtest.h>
 
+TEST(RenderingTest, RejectsOutOfBoundsPath) {
+    const Grid<int> maze(2, 2);
+    EXPECT_THROW(renderMaze(maze, {{2, 0}}), std::out_of_range);
+    EXPECT_THROW(renderMaze(maze, {{0, 0}, {0, 2}}), std::out_of_range);
+}
+
+TEST(RenderingTest, RejectsPathsThroughWallsOrNonadjacentCells) {
+    const Grid<int> maze(2, 3);
+    EXPECT_THROW(renderMaze(maze, {{0, 0}, {0, 1}}), std::invalid_argument);
+    EXPECT_THROW(renderMaze(maze, {{0, 0}, {1, 1}}), std::invalid_argument);
+    EXPECT_THROW(renderMaze(maze, {{0, 0}, {0, 2}}), std::invalid_argument);
+    EXPECT_THROW(renderMaze(maze, {{0, 0}, {0, 0}}), std::invalid_argument);
+}
+
 TEST(RenderingTest, DrawsClosedGrid) {
     const Grid<int> maze(2, 2);
     EXPECT_EQ(renderMaze(maze), "#####\n# # #\n#####\n# # #\n#####\n");

@@ -3,6 +3,13 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <string>
+#include <limits>
+
+TEST(GridTest, RejectsOverflowingDimensions) {
+    const auto maximum = std::numeric_limits<std::size_t>::max();
+    EXPECT_THROW((Grid<int>(maximum / 2 + 1, 2)), std::length_error);
+    EXPECT_THROW((Grid<int>(2, maximum / 2 + 1)), std::length_error);
+}
 
 TEST(GridTest, StoresDimensionsAndChecksBounds) {
     const Grid<int> grid(3, 4);

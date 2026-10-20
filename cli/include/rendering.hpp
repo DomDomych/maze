@@ -2,6 +2,8 @@
 
 #include "grid.hpp"
 
+#include <limits>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -10,6 +12,19 @@ std::string renderMaze(
     const Grid<T>& maze,
     const std::vector<Position>& path = {}
 ) {
+    const auto maximum = (std::numeric_limits<std::size_t>::max() - 1) / 2;
+    if (maze.rows() > maximum || maze.columns() > maximum) {
+        throw std::length_error("Maze is too large to render");
+    }
+    for (std::size_t i = 0; i < path.size(); ++i) {
+        if (!maze.contains(path[i])) {
+            throw std::out_of_range("Path position is outside the maze");
+        }
+        if (i > 0 && !maze.hasPassage(path[i - 1], path[i])) {
+            throw std::invalid_argument("Path must follow open passages");
+        }
+    }
+
     std::vector<std::string> drawing(
         maze.rows() * 2 + 1,
         std::string(maze.columns() * 2 + 1, '#')

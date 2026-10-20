@@ -11,7 +11,7 @@ if ! command -v clang-format >/dev/null 2>&1; then
     exit 1
 fi
 
-files=("$project_dir/main.cpp")
+files=("$project_dir/main.cpp" "$project_dir/main_example.cpp")
 while IFS= read -r -d '' file; do
     files+=("$file")
 done < <(find "$project_dir/core" "$project_dir/cli" "$project_dir/tests" \

@@ -44,6 +44,9 @@ Grid<T>::Grid(std::size_t rows, std::size_t columns)
     if (rows == 0 || columns == 0) {
         throw std::invalid_argument("Grid dimensions must be positive");
     }
+    if (rows > std::numeric_limits<std::size_t>::max() / columns) {
+        throw std::length_error("Grid dimensions are too large");
+    }
     cells_.resize(rows * columns);
 }
 

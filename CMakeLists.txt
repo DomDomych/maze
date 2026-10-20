@@ -5,6 +5,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 add_executable(maze
     main.cpp
     cli/src/cli.cpp
@@ -23,7 +27,7 @@ if(BUILD_TESTING)
     find_package(GTest CONFIG QUIET)
     if(NOT GTest_FOUND)
         include(FetchContent)
-        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+        set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
         FetchContent_Declare(googletest
             URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
         )
